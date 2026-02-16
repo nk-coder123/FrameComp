@@ -18,47 +18,9 @@ struct LensPickerView: View {
     var body: some View {
         NavigationStack {
             List {
-                ForEach(LensProfile.LensCategory.allCases, id: \.self) { category in
-                    let presets = LensProfile.presets.filter { $0.category == category }
-                    if !presets.isEmpty {
-                        Section(category.displayName) {
-                            ForEach(presets) { preset in
-                                    Button {
-                                        settings.selectedLensFocalLength = preset.focalLengthMM
-                                        settings.save()
-                                        dismiss()
-                                    } label: {
-                                        HStack {
-                                            Text(preset.displayName)
-                                            Spacer()
-                                            if settings.selectedLensFocalLength == preset.focalLengthMM {
-                                                Image(systemName: "checkmark")
-                                            }
-                                        }
-                                    }
-                            }
-                        }
-                    }
-                }
-                Section("Custom Focal Length") {
-                    HStack {
-                        TextField("mm", value: $customFocalLength, format: .number)
-                            .keyboardType(.numberPad)
-                            .frame(width: 60)
-                        Slider(value: $customFocalLength, in: 8...600, step: 1)
-                    }
-                    .onChange(of: customFocalLength) { newValue in
-                        applyCustomFocalLength(newValue)
-                    }
-                }
-                Section {
-                    let equiv = FOVMatcher.equivalentFocalLength(fujiFocalMM: settings.selectedLensFocalLength)
-                    let fov = FOVMatcher.horizontalFOV(focalLengthMM: settings.selectedLensFocalLength)
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("35mm equivalent: \(Int(equiv)) mm")
-                        Text("Horizontal FOV: \(String(format: "%.1f", fov))°")
-                    }
-                }
+                presetSections
+                customFocalLengthSection
+                infoSection
             }
             .navigationTitle("Select Lens")
             .navigationBarTitleDisplayMode(.inline)
@@ -69,6 +31,60 @@ struct LensPickerView: View {
             }
             .onAppear {
                 customFocalLength = settings.selectedLensFocalLength
+            }
+        }
+    }
+
+    private var presetSections: some View {
+        ForEach(LensProfile.LensCategory.allCases, id: \.self) { category in
+            let presets = LensProfile.presets.filter { $0.category == category }
+            if !presets.isEmpty {
+                Section(category.displayName) {
+                    ForEach(presets) { preset in
+                        presetRow(preset)
+                    }
+                }
+            }
+        }
+    }
+
+    private func presetRow(_ preset: LensProfile) -> some View {
+        Button {
+            settings.selectedLensFocalLength = preset.focalLengthMM
+            settings.save()
+            dismiss()
+        } label: {
+            HStack {
+                Text(preset.displayName)
+                Spacer()
+                if settings.selectedLensFocalLength == preset.focalLengthMM {
+                    Image(systemName: "checkmark")
+                }
+            }
+        }
+    }
+
+    private var customFocalLengthSection: some View {
+        Section("Custom Focal Length") {
+            HStack {
+                TextField("mm", value: $customFocalLength, format: .number)
+                    .keyboardType(.numberPad)
+                    .frame(width: 60)
+                Slider(value: $customFocalLength, in: 8...600, step: 1)
+            }
+            .onChange(of: customFocalLength) { newValue in
+                applyCustomFocalLength(newValue)
+            }
+        }
+    }
+
+    private var infoSection: some View {
+        Section {
+            let equiv = FOVMatcher.equivalentFocalLength(fujiFocalMM: settings.selectedLensFocalLength)
+            let fov = FOVMatcher.horizontalFOV(focalLengthMM: settings.selectedLensFocalLength)
+            VStack(alignment: .leading, spacing: 4) {
+                Text("35mm equivalent: \(Int(equiv)) mm")
+                Text("Horizontal FOV: \(String(format: "%.1f", fov))°")
             }
         }
     }

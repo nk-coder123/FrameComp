@@ -15,6 +15,13 @@ struct LensPickerView: View {
     @State private var customFocalLength: CGFloat = 23
     @State private var debounceTask: Task<Void, Never>?
 
+    private static let focalLengthFormatter: NumberFormatter = {
+        let f = NumberFormatter()
+        f.numberStyle = .decimal
+        f.maximumFractionDigits = 0
+        return f
+    }()
+
     var body: some View {
         NavigationStack {
             List {
@@ -67,7 +74,7 @@ struct LensPickerView: View {
     private var customFocalLengthSection: some View {
         Section("Custom Focal Length") {
             HStack {
-                TextField("mm", value: $customFocalLength, format: .number)
+                TextField("mm", value: $customFocalLength, formatter: Self.focalLengthFormatter)
                     .keyboardType(.numberPad)
                     .frame(width: 60)
                 Slider(value: $customFocalLength, in: 8...600, step: 1)

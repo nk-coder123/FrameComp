@@ -59,13 +59,13 @@ struct ViewfinderView: View {
             cameraEngine.applyLens(focalLengthMM: settings.selectedLensFocalLength)
             viewModel.syncFromSettings()
         }
-        .onChange(of: settings.selectedLensFocalLength) { _, newValue in
+        .onChange(of: settings.selectedLensFocalLength) { newValue in
             cameraEngine.applyLens(focalLengthMM: newValue)
         }
         .onDisappear {
             cameraEngine.stop()
         }
-        .onChange(of: scenePhase) { _, newPhase in
+        .onChange(of: scenePhase) { newPhase in
             if newPhase == .active {
                 cameraEngine.start()
                 cameraEngine.applyLens(focalLengthMM: settings.selectedLensFocalLength)

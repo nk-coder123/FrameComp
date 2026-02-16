@@ -37,12 +37,18 @@ struct ViewfinderView: View {
             } else {
                 cameraView
                 if showChrome {
-                    VStack {
-                        topBar
-                        Spacer()
-                        ControlStripView(viewModel: viewModel)
+                    GeometryReader { geo in
+                        VStack(spacing: 0) {
+                            topBar
+                                .padding(.top, geo.safeAreaInsets.top + 8)
+                            Spacer()
+                            fovBadge
+                                .padding(.bottom, 8)
+                            ControlStripView(viewModel: viewModel)
+                                .padding(.bottom, geo.safeAreaInsets.bottom)
+                        }
                     }
-                    fovBadge
+                    .ignoresSafeArea()
                 }
             }
         }
@@ -134,8 +140,8 @@ struct ViewfinderView: View {
                     .foregroundColor(.white)
             }
         }
-        .padding()
-        .padding(.top, 8)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
     }
 
     private var fovBadge: some View {

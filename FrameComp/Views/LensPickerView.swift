@@ -46,19 +46,9 @@ struct LensPickerView: View {
                             .keyboardType(.numberPad)
                             .frame(width: 60)
                         Slider(value: $customFocalLength, in: 8...600, step: 1)
-                            .onChange(of: customFocalLength) { _, newValue in
-                                let value = min(600, max(8, newValue))
-                                if value != newValue { customFocalLength = value }
-                                debounceTask?.cancel()
-                                debounceTask = Task {
-                                    try? await Task.sleep(nanoseconds: 100_000_000)
-                                    guard !Task.isCancelled else { return }
-                                    await MainActor.run {
-                                        settings.selectedLensFocalLength = value
-                                        settings.save()
-                                    }
-                                }
-                            }
+                    }
+                    .onChange(of: customFocalLength) { newValue in
+                        applyCustomFocalLength(newValue)
                     }
                 }
                 Section {
@@ -79,6 +69,20 @@ struct LensPickerView: View {
             }
             .onAppear {
                 customFocalLength = settings.selectedLensFocalLength
+            }
+        }
+    }
+
+    private func applyCustomFocalLength(_ newValue: CGFloat) {
+        let value = min(600, max(8, newValue))
+        if value != newValue { customFocalLength = value }
+        debounceTask?.cancel()
+        debounceTask = Task {
+            try? await Task.sleep(nanoseconds: 100_000_000)
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                settings.selectedLensFocalLength = value
+                settings.save()
             }
         }
     }

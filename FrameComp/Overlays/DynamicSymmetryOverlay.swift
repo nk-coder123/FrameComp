@@ -16,8 +16,6 @@ struct DynamicSymmetryOverlay: CompositionOverlay {
 
     func path(in rect: CGRect, orientation: Int) -> CGPath {
         let path = CGMutablePath()
-        let w = rect.width
-        let h = rect.height
         let minX = rect.minX
         let maxX = rect.maxX
         let minY = rect.minY

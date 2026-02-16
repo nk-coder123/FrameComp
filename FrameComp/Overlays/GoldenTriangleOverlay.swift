@@ -23,7 +23,6 @@ struct GoldenTriangleOverlay: CompositionOverlay {
         if orientation % 2 == 0 {
             path.move(to: CGPoint(x: rect.minX, y: rect.maxY))
             path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
-            let d = hypot(rect.width, rect.height)
             let lowX = rect.minX + (rect.maxX - rect.minX) * goldenLow
             let lowY = rect.maxY - (rect.maxY - rect.minY) * goldenLow
             let highX = rect.minX + (rect.maxX - rect.minX) * goldenHigh
